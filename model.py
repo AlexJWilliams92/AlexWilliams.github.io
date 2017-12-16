@@ -21,22 +21,6 @@ agents = []
 fig = matplotlib.pyplot.figure(figsize=(7, 7))
 ax = fig.add_axes([0, 0, 1, 1])
 
-#Sets up the GUI window    
-root = tkinter.Tk() 
-root.wm_title("Model")
-canvas = matplotlib.backends.backend_tkagg.FigureCanvasTkAgg(fig, master=root)
-canvas._tkcanvas.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)    
-
-#Adds menu and option to run model to GUI window
-menu_bar = tkinter.Menu(root)
-root.config(menu=menu_bar)
-model_menu = tkinter.Menu(menu_bar)
-menu_bar.add_cascade(label="Model", menu=model_menu)
-model_menu.add_command(label="Run model", command=run)  
-
-#Begin timing
-start = getTimeMS()  
-
 #Reads in csv file to represent the environment
 f = open('in.txt', newline='') 
 reader = csv.reader(f, quoting=csv.QUOTE_NONNUMERIC)
@@ -77,6 +61,8 @@ td_xs = soup.find_all(attrs={"class" : "x"})
 '''print(td_ys)
 print(td_xs)'''
 
+#Begin timing
+start = getTimeMS()  
 
 # Make the agents based on the web data and add them to the agents array.
 for i in range(num_of_agents):  
@@ -105,7 +91,19 @@ def update(frame_number):
 def run():
     animation = matplotlib.animation.FuncAnimation(fig, update, interval=1, repeat=False, frames=num_of_iterations)
     canvas.show()
-     
+   
+#Sets up the GUI window    
+root = tkinter.Tk() 
+root.wm_title("Model")
+canvas = matplotlib.backends.backend_tkagg.FigureCanvasTkAgg(fig, master=root)
+canvas._tkcanvas.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)    
+
+#Adds menu and option to run model to GUI window
+menu_bar = tkinter.Menu(root)
+root.config(menu=menu_bar)
+model_menu = tkinter.Menu(menu_bar)
+menu_bar.add_cascade(label="Model", menu=model_menu)
+model_menu.add_command(label="Run model", command=run)   
 
 #For loop to test each agent against each other
 for j in range(0, num_of_agents - 1):
