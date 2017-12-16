@@ -11,15 +11,31 @@ import requests
 import bs4
 
 
-#Reads in web data to initialise model
-r = requests.get('http://www.geog.leeds.ac.uk/courses/computing/practicals/python/agent-framework/part9/data.html')
-content = r.text
-soup = bs4.BeautifulSoup(content, 'html.parser')
-td_ys = soup.find_all(attrs={"class" : "y"})
-td_xs = soup.find_all(attrs={"class" : "x"})
-print(td_ys)
-print(td_xs)
+#Parameters for the model
+num_of_agents = 10
+num_of_iterations = 100
+neighbourhood = 20
+agents = []
 
+#Setup for the animation function
+fig = matplotlib.pyplot.figure(figsize=(7, 7))
+ax = fig.add_axes([0, 0, 1, 1])
+
+#Sets up the GUI window    
+root = tkinter.Tk() 
+root.wm_title("Model")
+canvas = matplotlib.backends.backend_tkagg.FigureCanvasTkAgg(fig, master=root)
+canvas._tkcanvas.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)    
+
+#Adds menu and option to run model to GUI window
+menu_bar = tkinter.Menu(root)
+root.config(menu=menu_bar)
+model_menu = tkinter.Menu(menu_bar)
+menu_bar.add_cascade(label="Model", menu=model_menu)
+model_menu.add_command(label="Run model", command=run)  
+
+#Begin timing
+start = getTimeMS()  
 
 #Reads in csv file to represent the environment
 f = open('in.txt', newline='') 
@@ -34,9 +50,9 @@ print(value) 				# Floats
 f.close() 	# Don't close until you are done with the reader;
         		# the data is read on request.
 
-
-#matplotlib.pyplot.imshow(environment)
-#matplotlib.pyplot.show()#testofinputdata
+#Used for testing
+'''matplotlib.pyplot.imshow(environment)
+matplotlib.pyplot.show()#testofinputdata'''
 
 
 #Timing of the model run
@@ -50,26 +66,23 @@ def distance_between(self, agent):
     return (((self.x - agent.x)**2) + ((self.y - agent.y)**2))**0.5
 
 
-#Paramenters for the model
-num_of_agents = 10
-num_of_iterations = 100
-neighbourhood = 20
-agents = []
+#Reads in web data to initialise model
+r = requests.get('http://www.geog.leeds.ac.uk/courses/computing/practicals/python/agent-framework/part9/data.html')
+content = r.text
+soup = bs4.BeautifulSoup(content, 'html.parser')
+td_ys = soup.find_all(attrs={"class" : "y"})
+td_xs = soup.find_all(attrs={"class" : "x"})
 
-#Begin timing
-start = getTimeMS()  
+#Used for testing
+'''print(td_ys)
+print(td_xs)'''
 
 
-# Make the agents and append data to the agent class.
+# Make the agents based on the web data and add them to the agents array.
 for i in range(num_of_agents):  
     y = int(td_ys[i].text)
     x = int(td_xs[i].text)
     agents.append(agentframework.Agent(environment, agents, y, x))
-
-
-
-fig = matplotlib.pyplot.figure(figsize=(7, 7))
-ax = fig.add_axes([0, 0, 1, 1])
 
 
 #For loop to update model for each iteration
@@ -92,21 +105,7 @@ def update(frame_number):
 def run():
     animation = matplotlib.animation.FuncAnimation(fig, update, interval=1, repeat=False, frames=num_of_iterations)
     canvas.show()
-  
-#Sets up the GUI window    
-root = tkinter.Tk() 
-root.wm_title("Model")
-canvas = matplotlib.backends.backend_tkagg.FigureCanvasTkAgg(fig, master=root)
-canvas._tkcanvas.pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)    
-
-
-#Adds menu and option to run model to GUI window
-menu_bar = tkinter.Menu(root)
-root.config(menu=menu_bar)
-model_menu = tkinter.Menu(menu_bar)
-menu_bar.add_cascade(label="Model", menu=model_menu)
-model_menu.add_command(label="Run model", command=run)     
-
+     
 
 #For loop to test each agent against each other
 for j in range(0, num_of_agents - 1):
